@@ -298,14 +298,11 @@ SSL_CTX * initialize_ctx(const char ask_compression, const char *ca_path)
 	meth = SSLv23_method();
 	ctx = SSL_CTX_new(meth);
 
-	if (ca_path == NULL)
-#if defined(__NetBSD__)
-		ca_path = "/etc/openssl/certs";
-#else
-		ca_path = "/etc/ssl/certs";
-#endif
-
-	SSL_CTX_load_verify_locations(ctx, NULL, ca_path);
+	if (ca_path == NULL) {
+		SSL_CTX_set_default_verify_paths(ctx);
+	} else {
+		SSL_CTX_load_verify_locations(ctx, NULL, ca_path);
+	}
 
 #ifdef SSL_OP_NO_COMPRESSION
 	if (!ask_compression)
